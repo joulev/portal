@@ -79,6 +79,13 @@ function Coordinate(x: number, y: number): Point {
 
 type UIState = null | "Predicting";
 
+interface AnalyticGraphDataPoint {
+  frame: number;
+  data: {
+    [tag: string]: number;
+  };
+}
+
 interface AnnotatorProps {
   project: string;
   user: any;
@@ -148,6 +155,9 @@ interface AnnotatorState {
     opacity: number;
   };
   currAnnotationPlaybackId: number;
+  /* With analytic mode enabled, the graph is shown instead of the image bar */
+  isAnalyticMode: boolean;
+  analyticGraphData: AnalyticGraphDataPoint[];
 }
 
 /**
@@ -246,6 +256,8 @@ export default class Annotator extends Component<
         },
       },
       currAnnotationPlaybackId: 0,
+      isAnalyticMode: false,
+      analyticGraphData: [],
     };
 
     this.toaster = new Toaster({}, {});
@@ -787,6 +799,36 @@ export default class Annotator extends Component<
       )
         .then(response => {
           if (this.currentAsset.url === asset.url && singleAnalysis) {
+            // Gather the data needed for analytics
+            const graphData: AnalyticGraphDataPoint[] = Object.entries(
+              response.data.frames
+            ).map(([frame, _annotation]) => {
+              const annotation = _annotation as {
+                confidence: number;
+                tag: { id: number; name: string };
+              }[];
+              const allTagNames = Array.from(
+                new Set<string>(annotation.map(a => a.tag.name))
+              );
+              return {
+                frame: parseInt(frame, 10),
+                data: Object.fromEntries(
+                  allTagNames.map(
+                    tag =>
+                      [
+                        tag,
+                        annotation.filter(
+                          a =>
+                            a.tag.name === tag &&
+                            a.confidence >= this.state.confidence
+                        ).length,
+                      ] as const
+                  )
+                ),
+              };
+            });
+            this.setState({ analyticGraphData: graphData });
+
             const videoElement = this.videoOverlay.getElement();
             /**
              * Recursive Callback function that
@@ -1315,6 +1357,9 @@ export default class Annotator extends Component<
       this.backgroundImg = document.querySelector(
         ".leaflet-pane.leaflet-overlay-pane video.leaflet-image-layer"
       );
+
+      /* Show the analysis graph */
+      this.setState({ isAnalyticMode: true });
     }
   }
 
@@ -1574,15 +1619,26 @@ export default class Annotator extends Component<
               className={[isCollapsed, "image-bar"].join("")}
               id={"image-bar"}
             >
-              <ImageBar
-                ref={ref => {
-                  this.imagebarRef = ref;
-                }}
-                /* Only visible assets should be shown */
-                assetList={visibleAssets}
-                callbacks={{ selectAssetCallback: this.selectAsset }}
-                {...this.props}
-              />
+              {this.state.isAnalyticMode ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    console.log(this.state.analyticGraphData);
+                  }}
+                >
+                  Click me
+                </button>
+              ) : (
+                <ImageBar
+                  ref={ref => {
+                    this.imagebarRef = ref;
+                  }}
+                  /* Only visible assets should be shown */
+                  assetList={visibleAssets}
+                  callbacks={{ selectAssetCallback: this.selectAsset }}
+                  {...this.props}
+                />
+              )}
             </Card>
           </div>
 
