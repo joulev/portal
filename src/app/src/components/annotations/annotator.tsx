@@ -797,7 +797,7 @@ export default class Annotator extends Component<
             // Gather the data needed for analytics
             const graphData: AnalyticGraphDataPoint[] = Object.entries(
               response.data.frames
-            ).map(([frame, _annotation]) => {
+            ).map(([ms, _annotation]) => {
               const annotation = _annotation as {
                 confidence: number;
                 tag: { id: number; name: string };
@@ -806,7 +806,7 @@ export default class Annotator extends Component<
                 new Set<string>(annotation.map(a => a.tag.name))
               );
               return {
-                frame: parseInt(frame, 10),
+                ms: parseInt(ms, 10),
                 data: Object.fromEntries(
                   allTagNames.map(
                     tag =>
@@ -1618,10 +1618,7 @@ export default class Annotator extends Component<
               id={"image-bar"}
             >
               {this.state.isAnalyticMode ? (
-                <AnalyticsGraph
-                  fps={this.state.fps}
-                  dataPoints={this.state.analyticGraphData}
-                />
+                <AnalyticsGraph dataPoints={this.state.analyticGraphData} />
               ) : (
                 <ImageBar
                   ref={ref => {
