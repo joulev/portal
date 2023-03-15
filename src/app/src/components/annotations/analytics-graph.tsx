@@ -1,5 +1,5 @@
 import React from "react";
-import { LineChart, Line, XAxis, YAxis } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip } from "recharts";
 
 export interface AnalyticGraphDataPoint {
   frame: number;
@@ -37,6 +37,14 @@ export default function AnalyticsGraph({
   const tickFormatter = (value: number) => `${Math.round(value / fps)}s`;
   const labels = Object.keys(dataPoints[0].data);
   const rechartData = dataPoints.map(({ frame, data }) => ({ frame, ...data }));
+  const getDataDescription = (frame: number) => {
+    const data = dataPoints.find(d => d.frame === frame)?.data;
+    if (!data) return null;
+    return Object.entries(data)
+      .filter(([, value]) => value > 0)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(", ");
+  };
   return (
     <LineChart width={820} height={120} data={rechartData}>
       <XAxis
@@ -46,6 +54,9 @@ export default function AnalyticsGraph({
         tickFormatter={tickFormatter}
       />
       <YAxis />
+      <Tooltip
+        content={({ label: frame }) => <div>{getDataDescription(frame)}</div>}
+      />
       {labels.map((label, i) => (
         <Line type="monotone" dataKey={label} stroke={colours[i]} key={label} />
       ))}
