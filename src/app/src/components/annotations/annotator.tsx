@@ -152,6 +152,7 @@ interface AnnotatorState {
   /* With analytic mode enabled, the graph is shown instead of the image bar */
   isAnalyticMode: boolean;
   analyticGraphData: AnalyticGraphDataPoint[];
+  fps: number;
 }
 
 /**
@@ -821,7 +822,10 @@ export default class Annotator extends Component<
                 ),
               };
             });
-            this.setState({ analyticGraphData: graphData });
+            this.setState({
+              analyticGraphData: graphData,
+              fps: response.data.fps,
+            });
 
             const videoElement = this.videoOverlay.getElement();
             /**
@@ -1614,7 +1618,10 @@ export default class Annotator extends Component<
               id={"image-bar"}
             >
               {this.state.isAnalyticMode ? (
-                <AnalyticsGraph dataPoints={this.state.analyticGraphData} />
+                <AnalyticsGraph
+                  fps={this.state.fps}
+                  dataPoints={this.state.analyticGraphData}
+                />
               ) : (
                 <ImageBar
                   ref={ref => {
