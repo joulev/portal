@@ -43,7 +43,7 @@ Running the following command will open the Portal application on the browser vi
 > If you wish to run the application on gpu, add a trailing `--gpu` flag (This only works for TensorFlow Models)
 
 ```.bash
-python3.7 portal.py
+python3 portal.py
 ```
 
 #### Using Virtual Environment
@@ -89,14 +89,14 @@ Click on any image or video, press `Analyze`, and Portal will make the inference
 </p>
 
 #### Keymaps and Shortcuts
-
 To view the various key maps and shortcuts, press `?` on your keyboard whilst in Portal. There are various shortcuts such as showing labels of detections, going to the next photo, etc. If you have any suggestions or change recommendation, feel free to open a `Feature Request`
 
 **Portal works on both Mask and Bounding Box models.** For detailed documentations about advanced features of Portal can be found here : <a href="https://docs.datature.io/portal/documentation">Portal Documentation</a>
 
+
 ## Working with Datature Nexus
 
-Portal works seemlessly with [Nexus, our MLOps platform](https://datature.io), that helps developers and teams build computer vision models - it comes fully featured with an advanced annotator, augmentation studio, 30+ models and ability to train on multi-GPU settings. Anyhoo, here's how to build a model and run it in Portal -
+Portal works seemlessly with [Nexus, our MLOps platform](https://datature.io), that helps developers and teams build computer vision models - it comes fully featured with an advanced annotator, augmentation studio, 30+ models and ability to train on multi-GPU settings. Anyhoo, here's how to build a model and run it in Portal - 
 
 <p align="center">
   <img alt="Image Prediction" src="https://github.com/datature/portal/blob/develop/docs/images/screencaps/nexus-ss-4.png?raw=true" width="45%">
@@ -122,8 +122,9 @@ Portal works seemlessly with [Nexus, our MLOps platform](https://datature.io), t
   <img alt="Image Prediction" src="https://github.com/datature/portal/blob/develop/docs/images/nexus-rb.gif?raw=true" width="80%">
 </p>
 
-## Screencasts
 
+
+## Screencasts
 [Using Portal to Inspect Computer Vision Models](https://www.youtube.com/watch?v=dTaqVkr8re0)
 
 [Building an Object Detection Model with Datature](https://www.youtube.com/watch?v=KA4RGtnabDk)

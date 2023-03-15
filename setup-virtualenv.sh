@@ -41,8 +41,8 @@ if [[ "$OSTYPE" == "msys" ]]; then
 python -m pip install --upgrade pip
 python -m pip install pipenv
 else
-python3.7 -m pip install --upgrade pip
-python3.7 -m pip install pipenv
+python3 -m pip install --upgrade pip
+python3 -m pip install pipenv
 fi
 PIPENV_VENV_IN_PROJECT=1 PIPENV_DEFAULT_PYTHON_VERSION=3.7 pipenv sync -d
 
