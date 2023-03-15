@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip } from "recharts";
 
 export interface AnalyticGraphDataPoint {
@@ -6,6 +6,11 @@ export interface AnalyticGraphDataPoint {
   data: {
     [tag: string]: number;
   };
+}
+
+interface AnalyticsGraphProps {
+  dataPoints: AnalyticGraphDataPoint[];
+  onSelectTimeInSeconds: (timeInSeconds: number) => void;
 }
 
 const colours = [
@@ -20,30 +25,44 @@ const colours = [
   "grey",
 ];
 
-export default function AnalyticsGraph({
-  dataPoints,
-  onSelectTimeInSeconds,
-}: {
-  dataPoints: AnalyticGraphDataPoint[];
-  onSelectTimeInSeconds: (timeInSeconds: number) => void;
-}): JSX.Element | null {
-  if (dataPoints.length === 0) return <div>No datya points</div>;
+function useRechart(dataPoints: AnalyticGraphDataPoint[]) {
   const length = dataPoints[dataPoints.length - 1].ms / 1000;
   const intervalInSeconds = 1;
   const ticks = new Array(Math.ceil(length / intervalInSeconds))
     .fill(null)
     .map((_, i) => i * intervalInSeconds * 1000);
+
   const tickFormatter = (ms: number) => `${Math.round(ms / 1000)}s`;
+
   const labels = Object.keys(dataPoints[0].data);
-  const rechartData = dataPoints.map(({ ms, data }) => ({ ms, ...data }));
-  const getDataDescription = (ms: number) => {
-    const data = dataPoints.find(d => d.ms === ms)?.data;
-    if (!data) return null;
-    return Object.entries(data)
-      .filter(([, value]) => value > 0)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(", ");
-  };
+
+  const rechartData = useMemo(
+    () => dataPoints.map(({ ms, data }) => ({ ms, ...data })),
+    [dataPoints]
+  );
+
+  const getDataDescription = useCallback(
+    (ms: number) => {
+      const data = dataPoints.find(d => d.ms === ms)?.data;
+      if (!data) return null;
+      return Object.entries(data)
+        .filter(([, value]) => value > 0)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(", ");
+    },
+    [dataPoints]
+  );
+  return { ticks, tickFormatter, labels, rechartData, getDataDescription };
+}
+
+function Chart({ dataPoints, onSelectTimeInSeconds }: AnalyticsGraphProps) {
+  const {
+    ticks,
+    tickFormatter,
+    labels,
+    rechartData,
+    getDataDescription,
+  } = useRechart(dataPoints);
   return (
     <LineChart
       width={820}
@@ -69,4 +88,11 @@ export default function AnalyticsGraph({
       ))}
     </LineChart>
   );
+}
+
+export default function AnalyticsGraph(
+  props: AnalyticsGraphProps
+): JSX.Element | null {
+  if (props.dataPoints.length === 0) return <div>Loading&hellip;</div>;
+  return <Chart {...props} />;
 }
