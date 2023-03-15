@@ -49,6 +49,7 @@ import FileModal from "./filemodal";
 import AnnotatorSettings from "./utils/annotatorsettings";
 import FormatTimerSeconds from "./utils/timer";
 import { RegisteredModel } from "./model";
+import AnalyticsGraph, { AnalyticGraphDataPoint } from "./analytics-graph";
 
 type Point = [number, number];
 type MapType = L.DrawMap;
@@ -78,13 +79,6 @@ function Coordinate(x: number, y: number): Point {
 }
 
 type UIState = null | "Predicting";
-
-interface AnalyticGraphDataPoint {
-  frame: number;
-  data: {
-    [tag: string]: number;
-  };
-}
 
 interface AnnotatorProps {
   project: string;
@@ -1620,14 +1614,7 @@ export default class Annotator extends Component<
               id={"image-bar"}
             >
               {this.state.isAnalyticMode ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    console.log(this.state.analyticGraphData);
-                  }}
-                >
-                  Click me
-                </button>
+                <AnalyticsGraph dataPoints={this.state.analyticGraphData} />
               ) : (
                 <ImageBar
                   ref={ref => {
