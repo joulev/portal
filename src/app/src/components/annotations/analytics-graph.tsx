@@ -22,8 +22,10 @@ const colours = [
 
 export default function AnalyticsGraph({
   dataPoints,
+  onSelectTimeInSeconds,
 }: {
   dataPoints: AnalyticGraphDataPoint[];
+  onSelectTimeInSeconds: (timeInSeconds: number) => void;
 }): JSX.Element | null {
   if (dataPoints.length === 0) return <div>No datya points</div>;
   const length = dataPoints[dataPoints.length - 1].ms / 1000;
@@ -43,7 +45,15 @@ export default function AnalyticsGraph({
       .join(", ");
   };
   return (
-    <LineChart width={820} height={120} data={rechartData}>
+    <LineChart
+      width={820}
+      height={120}
+      data={rechartData}
+      onClick={e => {
+        if (typeof e.activeLabel !== "number") return;
+        onSelectTimeInSeconds(e.activeLabel / 1000);
+      }}
+    >
       <XAxis
         dataKey="ms"
         type="number"

@@ -1614,7 +1614,14 @@ export default class Annotator extends Component<
               id={"image-bar"}
             >
               {this.state.isAnalyticMode ? (
-                <AnalyticsGraph dataPoints={this.state.analyticGraphData} />
+                <AnalyticsGraph
+                  dataPoints={this.state.analyticGraphData}
+                  onSelectTimeInSeconds={s => {
+                    const element = this.videoOverlay.getElement();
+                    if (!element) return;
+                    element.currentTime = s;
+                  }}
+                />
               ) : (
                 <ImageBar
                   ref={ref => {
